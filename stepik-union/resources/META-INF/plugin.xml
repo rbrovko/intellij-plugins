@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>org.stepik.plugin.union</id>
     <name>Stepik Union</name>
-    <version>0.3.6</version>
+    <version>0.3.8</version>
     <vendor email="petr.bogdanov@stepik.org" url="http://www.stepik.org">Stepik</vendor>
 
     <description><![CDATA[
@@ -20,7 +20,7 @@
     <!--</change-notes>-->
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="141.0"/>
+    <idea-version since-build="162.1447.26"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->

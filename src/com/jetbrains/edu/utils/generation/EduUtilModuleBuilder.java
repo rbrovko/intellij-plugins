@@ -53,12 +53,12 @@ public class EduUtilModuleBuilder extends JavaModuleBuilder {
         }
         Project project = baseModule.getProject();
         StartupManager.getInstance(project).registerPostStartupActivity(() -> DumbService.getInstance(project).runWhenSmart(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-            EduIntellijUtils.addTemplate(project, src, "EduTestRunner.java");
+//            EduIntellijUtils.addTemplate(project, src, "EduTestRunner.java");
         })));
-        ExternalLibraryDescriptor descriptor = JUnitExternalLibraryDescriptor.JUNIT4;
-        List<String> defaultRoots = descriptor.getLibraryClassesRoots();
-        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
-        ModuleRootModificationUtil.addModuleLibrary(baseModule, descriptor.getPresentableName(), urls, Collections.<String>emptyList());
+//        ExternalLibraryDescriptor descriptor = JUnitExternalLibraryDescriptor.JUNIT4;
+//        List<String> defaultRoots = descriptor.getLibraryClassesRoots();
+//        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
+//        ModuleRootModificationUtil.addModuleLibrary(baseModule, descriptor.getPresentableName(), urls, Collections.<String>emptyList());
 
         String courseDirectory = StudyTaskManager.getInstance(project).getCourse().getCourseDirectory();
         FileUtil.copyDirContent(new File(courseDirectory, "util"), new File(src.getPath()));

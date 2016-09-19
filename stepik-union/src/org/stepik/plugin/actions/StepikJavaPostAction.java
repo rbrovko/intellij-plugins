@@ -18,9 +18,9 @@ import com.jetbrains.edu.learning.checker.StudyCheckUtils;
 import com.jetbrains.edu.learning.courseFormat.StudyStatus;
 import com.jetbrains.edu.learning.courseFormat.Task;
 import com.jetbrains.edu.learning.editor.StudyEditor;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
-import com.jetbrains.edu.learning.stepik.StepikConnectorPost;
-import com.jetbrains.edu.learning.stepik.StepikWrappers;
+import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
+import com.jetbrains.edu.learning.stepic.StepicConnectorPost;
+import com.jetbrains.edu.learning.stepic.StepicWrappers;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -47,25 +47,25 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
                 Task task = studyState.getTask();
 //                LOG.warn(task.getName());
-//                LOG.warn(Integer.toString(task.getStepikId()));
+//                LOG.warn(Integer.toString(task.getStepId()));
 
-                int intAttemptId = StepikConnectorPost.getAttempt(task.getStepikId()).attempts.get(0).id;
+                int intAttemptId = StepicConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
                 String attemptId = Integer.toString(intAttemptId);
 //                LOG.warn("att id = " + attemptId);
 //                studyState.getVirtualFile().get
                 Document document = FileDocumentManager.getInstance().getDocument(studyState.getVirtualFile());
-//                int attempt = StepikConnectorPost.postSubmission(task.getFile("Main.java").text, attemptId).submission.attempt;
-//                StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(document.getText(), attemptId);
+//                int attempt = StepicConnectorPost.postSubmission(task.getFile("Main.java").text, attemptId).submission.attempt;
+//                StepicWrappers.SubmissionContainer container = StepicConnectorPost.postSubmission(document.getText(), attemptId);
                 String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(task).getCurrentLang();
-                StepikWrappers.SubmissionToPostWrapper sTPW = new StepikWrappers.SubmissionToPostWrapper(attemptId, currentLang, document.getText());
-                StepikWrappers.SubmissionContainer container = StepikConnectorPost.postSubmission(sTPW);
-                List<StepikWrappers.SubmissionContainer.Submission> submissions = container.submissions;
-                StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                        StepikWrappers.MetricsWrapper.PluginNames.S_Union,
-                        StepikWrappers.MetricsWrapper.MetricActions.POST,
+                StepicWrappers.SubmissionToPostWrapper sTPW = new StepicWrappers.SubmissionToPostWrapper(attemptId, currentLang, document.getText());
+                StepicWrappers.SubmissionContainer container = StepicConnectorPost.postSubmission(sTPW);
+                List<StepicWrappers.SubmissionContainer.Submission> submissions = container.submissions;
+                StepicWrappers.MetricsWrapper metric = new StepicWrappers.MetricsWrapper(
+                        StepicWrappers.MetricsWrapper.PluginNames.S_Union,
+                        StepicWrappers.MetricsWrapper.MetricActions.POST,
                         task.getLesson().getCourse().getId(),
-                        task.getStepikId());
-                StepikConnectorPost.postMetric(metric);
+                        task.getStepId());
+                StepicConnectorPost.postMetric(metric);
                 int submissionId = submissions.get(0).id;
                 LOG.warn("submissionId = " + submissionId);
 
@@ -81,7 +81,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                             while (ans.equals("evaluation") && count < 100) {
                                 try {
                                     Thread.sleep(TIMER * 1000);          //1000 milliseconds is one second.
-                                    StepikWrappers.ResultSubmissionWrapper submissionWrapper = StepikConnectorGet.getStatus(finalSubmissionId);
+                                    StepicWrappers.ResultSubmissionWrapper submissionWrapper = StepicConnectorGet.getStatus(finalSubmissionId);
                                     ans = submissionWrapper.submissions[0].status;
                                     b = submissionWrapper.submissions[0].hint;
                                     count += TIMER;

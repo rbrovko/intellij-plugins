@@ -62,6 +62,9 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
         EduUtilModuleBuilder utilModuleBuilder = new EduUtilModuleBuilder(moduleDir);
         utilModule = utilModuleBuilder.createModule(moduleModel);
 
+//        EduSandboxModuleBuilder sandboxModuleBuilder = new EduSandboxModuleBuilder(moduleDir);
+//        Module sandboxModule = sandboxModuleBuilder.createModule(moduleModel);
+
         createLessonModules(moduleModel, course, moduleDir, utilModule);
 
         ApplicationManager.getApplication().invokeLater(

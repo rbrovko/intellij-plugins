@@ -15,9 +15,10 @@ import com.jetbrains.edu.learning.StudyUtils;
 import com.jetbrains.edu.learning.actions.StudyActionWithShortcut;
 import com.jetbrains.edu.learning.courseFormat.Task;
 import com.jetbrains.edu.learning.editor.StudyEditor;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
-import com.jetbrains.edu.learning.stepik.StepikConnectorPost;
-import com.jetbrains.edu.learning.stepik.StepikWrappers;
+import com.jetbrains.edu.learning.stepic.StepicWrappers;
+import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
+import com.jetbrains.edu.learning.stepic.StepicConnectorPost;
+import com.jetbrains.edu.learning.stepic.StepicWrappers;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +64,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
 
-        String stepId = Integer.toString(targetTask.getStepikId());
+        String stepId = Integer.toString(targetTask.getStepId());
         String userId = Integer.toString(StudyTaskManager.getInstance(project).getUser().getId());
 
         List<NameValuePair> nvps = new ArrayList<>();
@@ -71,18 +72,18 @@ public class DownloadSubmission extends StudyActionWithShortcut {
         nvps.add(new BasicNameValuePair("user", userId));
         nvps.add(new BasicNameValuePair("order", "desc"));
 
-        List<StepikWrappers.SubmissionContainer.Submission> submissions = StepikConnectorGet.getSubmissions(nvps).submissions;
-        StepikWrappers.MetricsWrapper metric = new StepikWrappers.MetricsWrapper(
-                StepikWrappers.MetricsWrapper.PluginNames.S_Union,
-                StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
+        List<StepicWrappers.SubmissionContainer.Submission> submissions = StepicConnectorGet.getSubmissions(nvps).submissions;
+        StepicWrappers.MetricsWrapper metric = new StepicWrappers.MetricsWrapper(
+                StepicWrappers.MetricsWrapper.PluginNames.S_Union,
+                StepicWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
                 targetTask.getLesson().getCourse().getId(),
-                targetTask.getStepikId());
-        StepikConnectorPost.postMetric(metric);
+                targetTask.getStepId());
+        StepicConnectorPost.postMetric(metric);
 
         String currentLang = StudyTaskManager.getInstance(project).getLangManager().getLangSetting(targetTask).getCurrentLang();
         String activateFileName = currentLang.equals("python3") ? "main.py" : "Main.java";
         String code = null;
-        for (StepikWrappers.SubmissionContainer.Submission submission : submissions){
+        for (StepicWrappers.SubmissionContainer.Submission submission : submissions){
             if (submission.reply.language.startsWith(currentLang) ){
                 code = submission.reply.code;
                 break;

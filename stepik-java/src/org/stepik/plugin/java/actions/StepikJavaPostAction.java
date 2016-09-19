@@ -46,9 +46,9 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
                 Task task = studyState.getTask();
                 LOG.warn(task.getName());
-                LOG.warn(Integer.toString(task.getStepikId()));
+                LOG.warn(Integer.toString(task.getStepId()));
 
-                int intAttemptId = StepikConnectorPost.getAttempt(task.getStepikId()).attempts.get(0).id;
+                int intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
                 String attemptId = Integer.toString(intAttemptId);
                 LOG.warn("att id = " + attemptId);
 //                studyState.getVirtualFile().get

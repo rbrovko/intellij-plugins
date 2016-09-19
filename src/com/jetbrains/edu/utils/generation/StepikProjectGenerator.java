@@ -11,8 +11,8 @@ import com.intellij.openapi.util.ThrowableComputable;
 import com.jetbrains.edu.learning.StudyUtils;
 import com.jetbrains.edu.learning.core.EduNames;
 import com.jetbrains.edu.learning.courseFormat.Course;
-import com.jetbrains.edu.learning.stepik.CourseInfo;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
+import com.jetbrains.edu.learning.stepic.CourseInfo;
+import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +34,7 @@ public class StepikProjectGenerator extends EduProjectGenerator {
             myCourses = getCoursesFromCache();
         }
         if (force || myCourses.isEmpty()) {
-            myCourses = execCancelable(StepikConnectorGet::getEnrolledCourses);
+            myCourses = execCancelable(StepicConnectorGet::getEnrolledCourses);
             flushCache(myCourses);
         }
         if (myCourses.isEmpty()) {
@@ -125,18 +125,18 @@ public class StepikProjectGenerator extends EduProjectGenerator {
     @Nullable
     protected Course getCourse(@NotNull final Project project) {
 
-        final File courseFile = new File(new File(OUR_COURSES_DIR, mySelectedCourseInfo.getName()), EduNames.COURSE_META_FILE);
-        if (courseFile.exists()) {
-            return readCourseFromCache(courseFile, false);
-        }
-        else if (myUser != null) {
-            final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR, ADAPTIVE_COURSE_PREFIX +
-                    mySelectedCourseInfo.getName() + "_" +
-                    myUser.getEmail()), EduNames.COURSE_META_FILE);
-            if (adaptiveCourseFile.exists()) {
-                return readCourseFromCache(adaptiveCourseFile, true);
-            }
-        }
+//        final File courseFile = new File(new File(OUR_COURSES_DIR, mySelectedCourseInfo.getName()), EduNames.COURSE_META_FILE);
+//        if (courseFile.exists()) {
+//            return readCourseFromCache(courseFile, false);
+//        }
+//        else if (myUser != null) {
+//            final File adaptiveCourseFile = new File(new File(OUR_COURSES_DIR, ADAPTIVE_COURSE_PREFIX +
+//                    mySelectedCourseInfo.getName() + "_" +
+//                    myUser.getEmail()), EduNames.COURSE_META_FILE);
+//            if (adaptiveCourseFile.exists()) {
+//                return readCourseFromCache(adaptiveCourseFile, true);
+//            }
+//        }
 
         return ProgressManager.getInstance().runProcessWithProgressSynchronously(new ThrowableComputable<Course, RuntimeException>() {
             @Override
@@ -144,7 +144,7 @@ public class StepikProjectGenerator extends EduProjectGenerator {
                 ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
                 return execCancelable(() -> {
 
-                    final Course course = StepikConnectorGet.getCourse(project, mySelectedCourseInfo);
+                    final Course course = StepicConnectorGet.getCourse(project, mySelectedCourseInfo);
                     if (course != null) {
                         flushCourse(project, course);
                         course.initCourse(false);

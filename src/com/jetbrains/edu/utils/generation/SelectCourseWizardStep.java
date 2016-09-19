@@ -13,10 +13,10 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.HyperlinkAdapter;
 import com.jetbrains.edu.learning.StudyTaskManager;
 import com.jetbrains.edu.learning.StudyUtils;
-import com.jetbrains.edu.learning.stepik.CourseInfo;
-import com.jetbrains.edu.learning.stepik.StepikConnectorGet;
-import com.jetbrains.edu.learning.stepik.StepikConnectorLogin;
-import com.jetbrains.edu.learning.stepik.StepikConnectorPost;
+import com.jetbrains.edu.learning.stepic.CourseInfo;
+import com.jetbrains.edu.learning.stepic.StepicConnectorGet;
+import com.jetbrains.edu.learning.stepic.StepicConnectorLogin;
+import com.jetbrains.edu.learning.stepic.StepicConnectorPost;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -135,7 +135,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     @Override
     public void updateStep() {
 //        StepikConnectorLogin.resetClient();
-        StepikConnectorLogin.loginFromDialog(defaultProject);
+        StepicConnectorLogin.loginFromDialog(defaultProject);
         userName.setText(StudyTaskManager.getInstance(defaultProject).getUser().getName());
     }
 
@@ -199,7 +199,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 return;
             }
 
-            selectedCourse = StepikConnectorGet.getCourseInfos(courseId).courses.get(0);
+            selectedCourse = StepicConnectorGet.getCourseInfos(courseId).courses.get(0);
             myGenerator.setSelectedCourse(selectedCourse);
             courseDescription.setText("<b>Course:</b> " + selectedCourse.toString() + "<br><br>" + selectedCourse.getDescription());
         }
@@ -221,8 +221,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
             }
             if (link.contains("unit=")) {
                 String unitId = link.split("&")[1].split("=")[1];
-                String sectionId = Integer.toString(StepikConnectorGet.getUnits(unitId).units.get(0).section);
-                return Integer.toString(StepikConnectorGet.getSections(sectionId).sections.get(0).course);
+                String sectionId = Integer.toString(StepicConnectorGet.getUnits(unitId).units.get(0).section);
+                return Integer.toString(StepicConnectorGet.getSections(sectionId).sections.get(0).course);
             }
             if (link.contains("lesson/")) {
                 List<String> ar = Arrays.asList(link.split("/"));
@@ -231,8 +231,8 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
                 if (i == ar.size()) return "-1";
                 String[] parts = ar.get(i).split("-");
                 String lessonId = parts[parts.length - 1];
-                String sectionId = Integer.toString(StepikConnectorGet.getUnits("?lesson=" + lessonId).units.get(0).section);
-                return Integer.toString(StepikConnectorGet.getSections(sectionId).sections.get(0).course);
+                String sectionId = Integer.toString(StepicConnectorGet.getUnits("?lesson=" + lessonId).units.get(0).section);
+                return Integer.toString(StepicConnectorGet.getSections(sectionId).sections.get(0).course);
             }
             return "-1";
         }
@@ -258,7 +258,7 @@ public class SelectCourseWizardStep extends ModuleWizardStep {
     public void onWizardFinished() throws CommitStepException {
         super.onWizardFinished();
         if (buildType.getSelectedItem().equals(COURSE_LINK)){
-            StepikConnectorPost.enrollToCourse(selectedCourse.getId());
+            StepicConnectorPost.enrollToCourse(selectedCourse.getId());
         }
     }
 }
