@@ -24,11 +24,10 @@ public class StepikJavaSectionBuilder extends JavaModuleBuilder implements Lesso
     private final Module myUtilModule;
     private List<Pair<String, String>> mySourcePaths;
 
-    public StepikJavaSectionBuilder(@NotNull String moduleDir, int sectionIndex, @NotNull Module utilModule) {
+    public StepikJavaSectionBuilder(@NotNull String moduleDir, String sectionDir, @NotNull Module utilModule) {
         myUtilModule = utilModule;
-        String sectionName = EduNames.SECTION + sectionIndex;
-        setName(sectionName);
-        setModuleFilePath(FileUtil.join(moduleDir, sectionName, sectionName + ModuleFileType.DOT_DEFAULT_EXTENSION));
+        setName(sectionDir);
+        setModuleFilePath(FileUtil.join(moduleDir, sectionDir, sectionDir + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
 
     @Override

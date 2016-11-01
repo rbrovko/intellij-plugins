@@ -58,8 +58,7 @@ public class StudyGenerator {
             @NotNull final VirtualFile lessonDir,
             @NotNull final File resourceRoot,
             @NotNull final Project project) throws IOException {
-        VirtualFile taskDir = lessonDir.createChildDirectory(project,
-                EduNames.TASK + Integer.toString(task.getIndex()));
+        VirtualFile taskDir = lessonDir.createChildDirectory(project, task.getDirectory());
         File newResourceRoot = new File(resourceRoot, taskDir.getName());
         int i = 0;
         for (Map.Entry<String, TaskFile> taskFile : task.getTaskFiles().entrySet()) {
@@ -98,12 +97,12 @@ public class StudyGenerator {
             @NotNull final File resourceRoot,
             @NotNull final Project project) throws IOException {
         if (EduNames.PYCHARM_ADDITIONAL.equals(lesson.getName())) return;
-        String lessonDirName = EduNames.LESSON + Integer.toString(lesson.getIndex());
+        String lessonDirName = lesson.getDirectory();
         VirtualFile lessonDir = courseDir.createChildDirectory(project, lessonDirName);
         final List<Task> taskList = lesson.getTaskList();
         for (int i = 1; i <= taskList.size(); i++) {
             Task task = taskList.get(i - 1);
-            task.setIndex(i);
+            task.setPosition(i);
             createTask(task, lessonDir, new File(resourceRoot, lessonDir.getName()), project);
         }
     }
@@ -121,12 +120,11 @@ public class StudyGenerator {
             @NotNull final Project project) {
 
         try {
-            int sectionIndex = 1;
             int lessonIndex = 1;
             for (Section section : course.getSections()) {
-                VirtualFile sectionDir = baseDir.createChildDirectory(project, EduNames.SECTION + sectionIndex++);
+                VirtualFile sectionDir = baseDir.createChildDirectory(project, section.getDirectory());
                 for (Lesson lesson : section.getLessons()) {
-                    lesson.setIndex(lessonIndex++);
+                    lesson.setPosition(lessonIndex++);
                     createLesson(lesson, sectionDir, resourceRoot, project);
                 }
             }

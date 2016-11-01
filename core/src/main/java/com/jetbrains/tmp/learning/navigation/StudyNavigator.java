@@ -4,10 +4,13 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
-import com.jetbrains.tmp.learning.courseFormat.*;
+import com.jetbrains.tmp.learning.courseFormat.AnswerPlaceholder;
+import com.jetbrains.tmp.learning.courseFormat.Course;
+import com.jetbrains.tmp.learning.courseFormat.Lesson;
+import com.jetbrains.tmp.learning.courseFormat.StudyStatus;
+import com.jetbrains.tmp.learning.courseFormat.Task;
+import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class StudyNavigator {
     private StudyNavigator() {
@@ -15,29 +18,34 @@ public class StudyNavigator {
 
     public static Task nextTask(@NotNull final Task task) {
         Lesson currentLesson = task.getLesson();
-        List<Task> taskList = currentLesson.getTaskList();
-        if (task.getIndex() < taskList.size()) {
-            return taskList.get(task.getIndex());
+        int position = task.getPosition() + 1;
+
+        Task nextTask = currentLesson.getTaskFromPosition(position);
+        if (nextTask != null) {
+            return nextTask;
         }
+
         Lesson nextLesson = nextLesson(currentLesson);
         if (nextLesson == null) {
             return null;
         }
-        return StudyUtils.getFirst(nextLesson.getTaskList());
+        return nextLesson.getTaskFromPosition(1);
     }
 
     public static Task previousTask(@NotNull final Task task) {
         Lesson currentLesson = task.getLesson();
-        int prevTaskIndex = task.getIndex() - 2;
-        if (prevTaskIndex >= 0) {
-            return currentLesson.getTaskList().get(prevTaskIndex);
+        int position = task.getPosition() - 1;
+
+        Task prevTask = currentLesson.getTaskFromPosition(position);
+        if (prevTask != null) {
+            return prevTask;
         }
+
         Lesson prevLesson = previousLesson(currentLesson);
         if (prevLesson == null) {
             return null;
         }
-        //getting last task in previous lesson
-        return prevLesson.getTaskList().get(prevLesson.getTaskList().size() - 1);
+        return prevLesson.getTaskFromPosition(prevLesson.getTaskList().size());
     }
 
     public static Lesson nextLesson(@NotNull final Lesson lesson) {
@@ -46,9 +54,9 @@ public class StudyNavigator {
             return null;
         }
 
-        int index = lesson.getIndex();
+        int position = lesson.getPosition();
 
-        Lesson nextLesson = course.getLessonOfIndex(index + 1);
+        Lesson nextLesson = course.getLessonOfPosition(position + 1);
 
         if (nextLesson == null || EduNames.PYCHARM_ADDITIONAL.equals(nextLesson.getName())) {
             return null;
@@ -61,12 +69,12 @@ public class StudyNavigator {
         if (course == null)
             return null;
 
-        int index = lesson.getIndex();
-        if (index <= 0) {
+        int position = lesson.getPosition();
+        if (position <= 0) {
             return null;
         }
 
-        return course.getLessonOfIndex(index - 1);
+        return course.getLessonOfPosition(position - 1);
     }
 
     public static void navigateToFirstFailedAnswerPlaceholder(

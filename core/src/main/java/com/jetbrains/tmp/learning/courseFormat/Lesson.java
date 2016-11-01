@@ -2,6 +2,7 @@ package com.jetbrains.tmp.learning.courseFormat;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -13,18 +14,17 @@ import java.util.List;
 public class Lesson implements StudyItem {
     @Transient
     public List<Integer> steps;
-    @Transient
-    public List<String> tags;
-    @Transient
+    @Expose
+    public List<String> tags = new ArrayList<>();
+    @Expose
     boolean is_public;
-    @Transient
-    int position;
+    @Expose
+    private int position;
     @Transient
     private Section section = null;
 
     @Expose
-    @SerializedName("id")
-    private int myId;
+    private int id = NULL_ID;
 
     @Expose
     @SerializedName("title")
@@ -33,9 +33,6 @@ public class Lesson implements StudyItem {
     @Expose
     @SerializedName("task_list")
     private List<Task> taskList = new ArrayList<>();
-
-    // index is visible to user number of lesson from 1 to lesson number
-    private int myIndex = -1;
 
     public Lesson() {
     }
@@ -47,6 +44,22 @@ public class Lesson implements StudyItem {
         }
     }
 
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public boolean is_public() {
+        return is_public;
+    }
+
+    public void setIs_public(boolean is_public) {
+        this.is_public = is_public;
+    }
+
     public String getName() {
         return name;
     }
@@ -55,12 +68,14 @@ public class Lesson implements StudyItem {
         this.name = name;
     }
 
-    public int getIndex() {
-        return myIndex;
+    @Override
+    public int getPosition() {
+        return position;
     }
 
-    public void setIndex(int index) {
-        myIndex = index;
+    @Override
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public List<Task> getTaskList() {
@@ -76,13 +91,14 @@ public class Lesson implements StudyItem {
     }
 
     public Task getTask(@NotNull final String name) {
-        int index = EduUtils.getIndex(name, EduNames.TASK) - 1;
+        int id = EduUtils.getIdFromDirectory(name, EduNames.TASK);
+        return getTask(id);
+    }
+
+    public Task getTask(int id) {
         List<Task> tasks = getTaskList();
-        if (!EduUtils.indexIsValid(index, tasks)) {
-            return null;
-        }
         for (Task task : tasks) {
-            if (task.getIndex() - 1 == index) {
+            if (task.getId() == id) {
                 return task;
             }
         }
@@ -100,11 +116,16 @@ public class Lesson implements StudyItem {
     }
 
     public int getId() {
-        return myId;
+        return id;
     }
 
     public void setId(int id) {
-        this.myId = id;
+        this.id = id;
+    }
+
+    @Override
+    public String getDirectory() {
+        return EduNames.LESSON + id;
     }
 
     @Transient
@@ -115,5 +136,19 @@ public class Lesson implements StudyItem {
     @Transient
     public void setSection(Section section) {
         this.section = section;
+    }
+
+    public Task getTaskFromPosition(int position) {
+        for (Task task : taskList) {
+            if (task.getPosition() == position) {
+                return task;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String getPath() {
+        return FileUtil.join(section.getPath(), getDirectory());
     }
 }

@@ -348,6 +348,9 @@ public class StudySerializationUtils {
             Element taskManagerElement = state.getChild(MAIN_ELEMENT);
 
             Element courseElement = getChildWithName(taskManagerElement, COURSE).getChild(COURSE_TITLED);
+            courseElement.getChildren().stream()
+                    .filter(option -> option.getAttribute(NAME).getValue().equals("courseDirectory"))
+                    .forEach(courseDirectory -> renameElement(courseDirectory, "cacheDirectory"));
             List<Element> lessons = getChildList(courseElement, LESSONS);
             Map<String, Element> lessonsNames = new java.util.HashMap<>();
             for (Element lesson : lessons) {
@@ -359,16 +362,24 @@ public class StudySerializationUtils {
             ArrayList<Element> list = new ArrayList<>();
             sectionsNames.entrySet().forEach(entry -> {
                 Element section = new Element("Section");
-                int index = EduUtils.getIndex(entry.getKey(), EduNames.SECTION);
-                addChildWithName(section, "index", index);
+                int position = EduUtils.getIdFromDirectory(entry.getKey(), EduNames.SECTION);
+                addChildWithName(section, "position", position);
                 addChildWithName(section, "name", entry.getValue());
                 ArrayList<Element> lessonsList = new ArrayList<>();
-                VirtualFile sectionDir = project.getBaseDir().findChild(EduNames.SECTION + index);
+                VirtualFile sectionDir = project.getBaseDir().findChild(EduNames.SECTION + position);
                 if (sectionDir != null) {
                     for (VirtualFile child : sectionDir.getChildren()) {
                         String name = child.getName();
                         Element lesson = lessonsNames.get(name);
                         if (lesson != null) {
+                            try {
+                                List<Element> taskList = getChildList(lesson, "taskList");
+                                taskList.forEach(task -> task.getChildren().stream()
+                                        .filter(option -> option.getAttribute(NAME).getValue().equals("stepId"))
+                                        .forEach(stepId -> renameElement(stepId, "id")));
+                            } catch (StudyUnrecognizedFormatException e) {
+                                e.printStackTrace();
+                            }
                             lessonsList.add(lesson);
                         }
                     }
@@ -406,17 +417,17 @@ public class StudySerializationUtils {
                     JsonDeserializationContext context) throws JsonParseException {
                 JsonObject courseObject = json.getAsJsonObject();
                 JsonArray lessons = courseObject.getAsJsonArray(LESSONS);
-                for (int lessonIndex = 1; lessonIndex <= lessons.size(); lessonIndex++) {
-                    JsonObject lessonObject = lessons.get(lessonIndex - 1).getAsJsonObject();
+                for (JsonElement lesson : lessons) {
+                    JsonObject lessonObject = lesson.getAsJsonObject();
                     JsonArray tasks = lessonObject.getAsJsonArray(TASK_LIST);
-                    for (int taskIndex = 1; taskIndex <= tasks.size(); taskIndex++) {
-                        JsonObject taskObject = tasks.get(taskIndex - 1).getAsJsonObject();
+                    for (JsonElement task : tasks) {
+                        JsonObject taskObject = task.getAsJsonObject();
                         for (Map.Entry<String, JsonElement> taskFile : taskObject.getAsJsonObject(TASK_FILES)
                                 .entrySet()) {
                             String name = taskFile.getKey();
                             String filePath = FileUtil.join(myCourseFile.getParent(),
-                                    EduNames.LESSON + lessonIndex,
-                                    EduNames.TASK + taskIndex,
+                                    EduNames.LESSON + lessonObject.get("id"),
+                                    EduNames.TASK + taskObject.get("id"),
                                     name);
                             VirtualFile resourceFile = LocalFileSystem.getInstance()
                                     .refreshAndFindFileByIoFile(new File(filePath));

@@ -41,12 +41,11 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
             @NotNull Module utilModule) {
         myTask = task;
         myUtilModule = utilModule;
-        String taskName = EduNames.TASK + task.getIndex();
+        String taskName = task.getDirectory();
         //module name like lessoni-taski
         String moduleName = name + "-" + taskName;
         setName(moduleName);
-        setModuleFilePath(FileUtil.join(moduleDir, taskName,
-                moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION));
+        setModuleFilePath(FileUtil.join(moduleDir, taskName, moduleName + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
 
 
@@ -80,9 +79,11 @@ public class StepikJavaTaskBuilder extends JavaModuleBuilder implements TaskBuil
         if (src == null) {
             return false;
         }
-        String courseResourcesDirectory = course.getCourseDirectory();
+        String courseResourcesDirectory = course.getCacheDirectory();
         String taskResourcesPath = FileUtil.join(courseResourcesDirectory,
-                EduNames.LESSON + myTask.getLesson().getIndex(), EduNames.TASK + myTask.getIndex());
+                myTask.getLesson().getSection().getDirectory(),
+                myTask.getLesson().getDirectory(),
+                myTask.getDirectory());
         FileUtil.copyDirContent(new File(taskResourcesPath), new File(FileUtil.join(src.getPath(), EduNames.HIDE)));
 
         Set<SupportedLanguages> supportedLang = getSupportedLang(taskResourcesPath);

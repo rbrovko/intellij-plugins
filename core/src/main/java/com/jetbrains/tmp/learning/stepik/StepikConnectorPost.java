@@ -32,6 +32,7 @@ import com.jetbrains.tmp.learning.core.EduUtils;
 import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Lesson;
 import com.jetbrains.tmp.learning.courseFormat.Section;
+import com.jetbrains.tmp.learning.courseFormat.StudyItem;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.apache.commons.codec.binary.Base64;
@@ -139,12 +140,12 @@ public class StepikConnectorPost {
 
     // TODO realise
     public static void postAttempt(@NotNull final Task task) {
-        if (task.getStepId() <= 0) {
+        if (task.getId() == StudyItem.NULL_ID) {
             return;
         }
 
         final HttpPost attemptRequest = new HttpPost(EduStepikNames.STEPIK_API_URL + EduStepikNames.ATTEMPTS);
-        String attemptRequestBody = new Gson().toJson(new StepikWrappers.AttemptWrapper(task.getStepId()));
+        String attemptRequestBody = new Gson().toJson(new StepikWrappers.AttemptWrapper(task.getId()));
         attemptRequest.setEntity(new StringEntity(attemptRequestBody, ContentType.APPLICATION_JSON));
 
         try {
@@ -208,7 +209,7 @@ public class StepikConnectorPost {
             @Nullable String login,
             @Nullable String password) {
         final HttpPost attemptRequest = new HttpPost(EduStepikNames.STEPIK_API_URL + EduStepikNames.ATTEMPTS);
-        String attemptRequestBody = new Gson().toJson(new StepikWrappers.AttemptWrapper(task.getStepId()));
+        String attemptRequestBody = new Gson().toJson(new StepikWrappers.AttemptWrapper(task.getId()));
         attemptRequest.setEntity(new StringEntity(attemptRequestBody, ContentType.APPLICATION_JSON));
 
         try {
@@ -291,7 +292,7 @@ public class StepikConnectorPost {
                     StepikWrappers.CoursesContainer.class).courses.get(0);
             int position = 1;
             for (Section section : course.getSections()) {
-                final int sectionId = postModule(postedCourse.id, section.getIndex(), section.getName());
+                final int sectionId = postModule(postedCourse.id, section.getPosition(), section.getName());
                 for (Lesson lesson : section.getLessons()) {
                     indicator.checkCanceled();
                     final int lessonId = postLesson(project, lesson, indicator);
@@ -322,7 +323,7 @@ public class StepikConnectorPost {
             final Task task = new Task();
             task.setLesson(lesson);
             task.setName(EduNames.PYCHARM_ADDITIONAL);
-            task.setIndex(1);
+            task.setPosition(1);
             task.setText(EduNames.PYCHARM_ADDITIONAL);
             for (VirtualFile file : files) {
                 try {
@@ -339,7 +340,7 @@ public class StepikConnectorPost {
                 }
             }
             lesson.addTask(task);
-            lesson.setIndex(1);
+            lesson.setPosition(1);
             final int lessonId = postLesson(project, lesson, indicator);
             postUnit(lessonId, 1, sectionId);
         }

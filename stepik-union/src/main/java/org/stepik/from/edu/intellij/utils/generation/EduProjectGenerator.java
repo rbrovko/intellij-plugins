@@ -29,7 +29,7 @@ public class EduProjectGenerator extends StudyProjectGenerator {
         //when we update builders we don't know anything about modules, so we create folders for lessons directly
         course.setUpToDate(true);
         StudyTaskManager.getInstance(project).setCourse(course);
-        course.setCourseDirectory(new File(OUR_COURSES_DIR,
+        course.setCacheDirectory(new File(OUR_COURSES_DIR,
                 Integer.toString(mySelectedCourseInfo.getId())).getAbsolutePath());
     }
 

@@ -28,7 +28,7 @@ public class StepikJavaLessonBuilder extends JavaModuleBuilder implements Lesson
     public StepikJavaLessonBuilder(@NotNull String moduleDir, @NotNull Lesson lesson, @NotNull Module utilModule) {
         myLesson = lesson;
         myUtilModule = utilModule;
-        String lessonName = EduNames.LESSON + lesson.getIndex();
+        String lessonName = lesson.getDirectory();
         setName(lessonName);
         setModuleFilePath(FileUtil.join(moduleDir, lessonName, lessonName + ModuleFileType.DOT_DEFAULT_EXTENSION));
     }
@@ -47,7 +47,7 @@ public class StepikJavaLessonBuilder extends JavaModuleBuilder implements Lesson
         List<Task> taskList = myLesson.getTaskList();
         for (int i = 0; i < taskList.size(); i++) {
             Task task = taskList.get(i);
-            task.setIndex(i + 1);
+            task.setPosition(i + 1); //FIXME delete me
             createTaskModule(moduleModel, task);
         }
         return baseModule;

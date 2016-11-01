@@ -65,7 +65,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
 
                     int intAttemptId = 0;
                     try {
-                        intAttemptId = StepikConnectorPost.getAttempt(task.getStepId()).attempts.get(0).id;
+                        intAttemptId = StepikConnectorPost.getAttempt(task.getId()).attempts.get(0).id;
                     } catch (IOException e) {
                         Notification notification = new Notification(
                                 "Step.sending",
@@ -96,7 +96,7 @@ public class StepikJavaPostAction extends StudyCheckAction {
                             StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                             StepikWrappers.MetricsWrapper.MetricActions.POST,
                             task.getLesson().getSection().getCourse().getId(),
-                            task.getStepId());
+                            task.getId());
                     StepikConnectorPost.postMetric(metric);
                     int submissionId = submissions.get(0).id;
                     logger.info("submissionId = " + submissionId);

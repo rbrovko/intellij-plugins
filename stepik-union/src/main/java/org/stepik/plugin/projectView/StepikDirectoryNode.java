@@ -10,9 +10,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.StudyUtils;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
+import com.jetbrains.tmp.learning.courseFormat.Course;
 import com.jetbrains.tmp.learning.courseFormat.Task;
 import com.jetbrains.tmp.learning.courseFormat.TaskFile;
 import org.jetbrains.annotations.NotNull;
@@ -39,15 +41,19 @@ public class StepikDirectoryNode extends PsiDirectoryNode {
 
     @Override
     public int getTypeSortWeight(boolean sortByType) {
-        String name = getValue().getName();
+        PsiDirectory value = getValue();
+        String name = value.getName();
+        StudyTaskManager taskManager = StudyTaskManager.getInstance(value.getProject());
+        Course course = taskManager.getCourse();
+
         if (name.startsWith(EduNames.SECTION)) {
-            return EduUtils.getIndex(name, EduNames.SECTION);
+            return course.getSectionOfMnemonic(name).getPosition();
         }
         if (name.startsWith(EduNames.LESSON)) {
-            return EduUtils.getIndex(name, EduNames.LESSON);
+            return course.getLessonOfMnemonic(name).getPosition();
         }
         if (name.startsWith(EduNames.TASK)) {
-            return EduUtils.getIndex(name, EduNames.TASK);
+            return course.getTaskOfMnemonic(name).getPosition();
         }
 
         return Integer.MAX_VALUE;

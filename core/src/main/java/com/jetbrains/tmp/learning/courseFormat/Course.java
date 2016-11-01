@@ -21,15 +21,15 @@ public class Course implements StudyItem {
     private String description;
     @Expose
     private String name;
-    private String myCourseDirectory = "";
     @Expose
-    private int id;
+    private String cacheDirectory = "";
+    @Expose
+    private int id = NULL_ID;
     private boolean myUpToDate;
     @Expose
     private boolean isAdaptive = false;
     @Expose
-    @SerializedName("language")
-    private String myLanguage = "Python";
+    private String language = "Python";
     @Expose
     private List<Section> sections = new ArrayList<>();
 
@@ -78,24 +78,21 @@ public class Course implements StudyItem {
         this.name = name;
     }
 
-    @Transient
     @Override
-    public int getIndex() {
+    public int getPosition() {
         return 0;
     }
 
-    @Transient
     @Override
-    public void setIndex(int index) {
+    public void setPosition(int position) {
 
     }
-
-    public String getCourseDirectory() {
-        return myCourseDirectory;
+    public String getCacheDirectory() {
+        return cacheDirectory;
     }
 
-    public void setCourseDirectory(@NotNull final String courseDirectory) {
-        myCourseDirectory = courseDirectory;
+    public void setCacheDirectory(@NotNull final String cacheDirectory) {
+        this.cacheDirectory = cacheDirectory;
     }
 
     public String getDescription() {
@@ -115,15 +112,15 @@ public class Course implements StudyItem {
     }
 
     public Language getLanguageById() {
-        return Language.findLanguageByID(myLanguage);
+        return Language.findLanguageByID(language);
     }
 
     public String getLanguage() {
-        return myLanguage;
+        return language;
     }
 
     public void setLanguage(@NotNull final String language) {
-        myLanguage = language;
+        this.language = language;
     }
 
     public void setAuthors(@NotNull List<StepikUser> authors) {
@@ -155,6 +152,11 @@ public class Course implements StudyItem {
         this.id = id;
     }
 
+    @Override
+    public String getDirectory() {
+        return ".";
+    }
+
     public String getCourseMode() {
         return courseMode;
     }
@@ -175,8 +177,13 @@ public class Course implements StudyItem {
     }
 
     @Nullable
-    private Section getSection(int index) {
-        return sections.get(index);
+    private Section getSection(int id) {
+        for (Section section : sections) {
+            if (section.getId() == id) {
+                return section;
+            }
+        }
+        return null;
     }
 
     @NotNull
@@ -184,15 +191,10 @@ public class Course implements StudyItem {
         return sections;
     }
 
-    public void addSectionWithSetIndex(Section section) {
-        section.setIndex(sections.size() + 1);
-        sections.add(section);
-    }
-
-    public Lesson getLessonOfIndex(int index) {
+    public Lesson getLessonOfId(int id) {
         for (Section section : getSections()) {
             for (Lesson lesson : section.getLessons()) {
-                if (lesson.getIndex() == index) {
+                if (lesson.getId() == id) {
                     return lesson;
                 }
             }
@@ -201,8 +203,8 @@ public class Course implements StudyItem {
     }
 
     public Lesson getLessonOfMnemonic(String name) {
-        int index = EduUtils.getIndex(name, EduNames.LESSON);
-        return getLessonOfIndex(index);
+        int id = EduUtils.getIdFromDirectory(name, EduNames.LESSON);
+        return getLessonOfId(id);
     }
 
     @Transient
@@ -217,7 +219,40 @@ public class Course implements StudyItem {
     }
 
     public Section getSectionOfMnemonic(String valueName) {
-        int index = EduUtils.getIndex(valueName, EduNames.SECTION);
-        return getSection(index - 1);
+        int id = EduUtils.getIdFromDirectory(valueName, EduNames.SECTION);
+        return getSection(id);
+    }
+
+    public Lesson getLessonOfPosition(int position) {
+        for (Section section : getSections()) {
+            for (Lesson lesson : section.getLessons()) {
+                if (lesson.getPosition() == position) {
+                    return lesson;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String getPath() {
+        return getDirectory();
+    }
+
+    public Task getTaskOfMnemonic(String name) {
+        int id = EduUtils.getIdFromDirectory(name, EduNames.TASK);
+        return getLTaskOfId(id);
+    }
+
+    private Task getLTaskOfId(int id) {
+        for (Section section : getSections()) {
+            for (Lesson lesson : section.getLessons()) {
+                for (Task task : lesson.getTaskList())
+                if (task.getId() == id) {
+                    return task;
+                }
+            }
+        }
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.xmlb.annotations.Transient;
@@ -20,11 +21,9 @@ import java.util.Map;
  * Implementation of task which contains task files, tests, input file for tests
  */
 public class Task implements StudyItem {
-    // index is visible to user number of task from 1 to task number
-    private int myIndex;
     private int position;
     private String text;
-    private Map<String, String> testsText = new HashMap<String, String>();
+    private Map<String, String> testsText = new HashMap<>();
     private StudyStatus myStatus = StudyStatus.Unchecked;
 
     @Transient
@@ -33,11 +32,10 @@ public class Task implements StudyItem {
     @Expose
     private String name;
     @Expose
-    private int stepId;
-
+    private int id;
     @Expose
     @SerializedName("task_files")
-    public Map<String, TaskFile> taskFiles = new HashMap<String, TaskFile>();
+    public Map<String, TaskFile> taskFiles = new HashMap<>();
 
     public Task() {}
 
@@ -72,14 +70,6 @@ public class Task implements StudyItem {
 
     public void setText(final String text) {
         this.text = text;
-    }
-
-    public int getIndex() {
-        return myIndex;
-    }
-
-    public void setIndex(int index) {
-        myIndex = index;
     }
 
     public Map<String, String> getTestsText() {
@@ -132,13 +122,15 @@ public class Task implements StudyItem {
 
     @Nullable
     public VirtualFile getTaskDir(@NotNull final Project project) {
-        String lessonDirName = EduNames.LESSON + String.valueOf(myLesson.getIndex());
-        String taskDirName = EduNames.TASK + String.valueOf(myIndex);
         VirtualFile courseDir = project.getBaseDir();
         if (courseDir != null) {
-            VirtualFile lessonDir = courseDir.findChild(lessonDirName);
+            VirtualFile sectionDir = courseDir.findChild(myLesson.getSection().getDirectory());
+            if (sectionDir == null) {
+                return null;
+            }
+            VirtualFile lessonDir = sectionDir.findChild(myLesson.getDirectory());
             if (lessonDir != null) {
-                return lessonDir.findChild(taskDirName);
+                return lessonDir.findChild(getDirectory());
             }
         }
         return null;
@@ -182,31 +174,27 @@ public class Task implements StudyItem {
 
         Task task = (Task) o;
 
-        if (myIndex != task.myIndex) return false;
-        if (name != null ? !name.equals(task.name) : task.name != null) return false;
-        if (taskFiles != null ? !taskFiles.equals(task.taskFiles) : task.taskFiles != null) return false;
-        if (text != null ? !text.equals(task.text) : task.text != null) return false;
-        if (testsText != null ? !testsText.equals(task.testsText) : task.testsText != null) return false;
-
-        return true;
+        return id == task.getId();
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + myIndex;
-        result = 31 * result + (taskFiles != null ? taskFiles.hashCode() : 0);
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (testsText != null ? testsText.hashCode() : 0);
-        return result;
+        return id;
     }
 
-    public void setStepId(int stepId) {
-        this.stepId = stepId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public int getStepId() {
-        return stepId;
+    @Override
+    public String getDirectory() {
+        return EduNames.TASK + id;
+    }
+
+    @SerializedName("stepId")
+    @Override
+    public int getId() {
+        return id;
     }
 
     @Override
@@ -229,5 +217,10 @@ public class Task implements StudyItem {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    @Override
+    public String getPath() {
+        return FileUtil.join(myLesson.getPath(), getDirectory());
     }
 }

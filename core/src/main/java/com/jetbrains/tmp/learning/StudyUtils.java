@@ -217,18 +217,11 @@ public class StudyUtils {
         }
     }
 
-    public static File copyResourceFile(
-            @NotNull final String sourceName, @NotNull final String copyName, @NotNull final Project project,
+    public static File copyResourceFile(@NotNull final String sourceName,
+            @NotNull final String copyName,
             @NotNull final Task task)
             throws IOException {
-        final StudyTaskManager taskManager = StudyTaskManager.getInstance(project);
-        final Course course = taskManager.getCourse();
-        int taskNum = task.getIndex();
-        int lessonNum = task.getLesson().getIndex();
-        assert course != null;
-        final String pathToResource = FileUtil.join(course.getCourseDirectory(),
-                EduNames.LESSON + lessonNum,
-                EduNames.TASK + taskNum);
+        final String pathToResource = task.getPath();
         final File resourceFile = new File(pathToResource, copyName);
         FileUtil.copy(new File(pathToResource, sourceName), resourceFile);
         return resourceFile;
@@ -336,13 +329,11 @@ public class StudyUtils {
                 if (lesson == null) {
                     return null;
                 }
-                int taskIndex = EduUtils.getIndex(taskDirName, EduNames.TASK) - 1;
+                int taskId = EduUtils.getIdFromDirectory(taskDirName, EduNames.TASK);
                 final List<Task> tasks = lesson.getTaskList();
-                if (!indexIsValid(taskIndex, tasks)) {
-                    return null;
-                }
-                final Task task = tasks.get(taskIndex);
-                return task.getFile(file.getName());
+                final Task task = lesson.getTask(taskId);
+                if (task != null)
+                    return task.getFile(file.getName());
             }
         }
         return null;
@@ -403,14 +394,7 @@ public class StudyUtils {
     @Nullable
     public static VirtualFile getPatternFile(@NotNull TaskFile taskFile, String name) {
         Task task = taskFile.getTask();
-        String lessonDir = EduNames.LESSON + String.valueOf(task.getLesson().getIndex());
-        String taskDir = EduNames.TASK + String.valueOf(task.getIndex());
-        Course course = task.getLesson().getSection().getCourse();
-        File resourceFile = new File(course.getCourseDirectory());
-        if (!resourceFile.exists()) {
-            return null;
-        }
-        String patternPath = FileUtil.join(resourceFile.getPath(), lessonDir, taskDir, name);
+        String patternPath = FileUtil.join(task.getPath(), name);
         VirtualFile patternFile = VfsUtil.findFileByIoFile(new File(patternPath), true);
         if (patternFile == null) {
             return null;

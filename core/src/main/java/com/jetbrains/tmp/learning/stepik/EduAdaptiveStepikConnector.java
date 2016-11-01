@@ -229,7 +229,7 @@ public class EduAdaptiveStepikConnector {
                     final Task unsolvedTask = adaptive.getTaskList().get(adaptive.getTaskList().size() - 1);
                     if (reaction == 0 || reaction == -1) {
                         unsolvedTask.setName(task.getName());
-                        unsolvedTask.setStepId(task.getStepId());
+                        unsolvedTask.setId(task.getId());
                         unsolvedTask.setText(task.getText());
                         unsolvedTask.getTestsText().clear();
                         unsolvedTask.setStatus(StudyStatus.Unchecked);
@@ -252,14 +252,11 @@ public class EduAdaptiveStepikConnector {
                             logger.warn("Got task without unexpected number of task files: " + taskFiles.size());
                         }
 
-                        final File lessonDirectory = new File(course.getCourseDirectory(),
-                                EduNames.LESSON + String.valueOf(adaptive.getIndex()));
-                        final File taskDirectory = new File(lessonDirectory,
-                                EduNames.TASK + String.valueOf(adaptive.getTaskList().size()));
+                        final File lessonDirectory = new File(course.getCacheDirectory(), adaptive.getDirectory());
+                        final File taskDirectory = new File(lessonDirectory, adaptive.getDirectory());
                         StudyProjectGenerator.flushTask(task, taskDirectory);
-                        StudyProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
-                        final VirtualFile lessonDir = project.getBaseDir()
-                                .findChild(EduNames.LESSON + String.valueOf(adaptive.getIndex()));
+                        StudyProjectGenerator.flushCourseJson(course, new File(course.getCacheDirectory()));
+                        final VirtualFile lessonDir = project.getBaseDir().findChild(adaptive.getDirectory());
 
                         if (lessonDir != null) {
                             createTestFiles(course, task, unsolvedTask, lessonDir);
@@ -270,9 +267,8 @@ public class EduAdaptiveStepikConnector {
                         }
                     } else {
                         adaptive.addTask(task);
-                        task.setIndex(adaptive.getTaskList().size());
-                        final VirtualFile lessonDir = project.getBaseDir()
-                                .findChild(EduNames.LESSON + String.valueOf(adaptive.getIndex()));
+                        task.setPosition(adaptive.getTaskList().size());
+                        final VirtualFile lessonDir = project.getBaseDir().findChild(adaptive.getDirectory());
 
                         if (lessonDir != null) {
                             ApplicationManager.getApplication()
@@ -280,7 +276,7 @@ public class EduAdaptiveStepikConnector {
                                         try {
                                             StudyGenerator.createTask(task,
                                                     lessonDir,
-                                                    new File(course.getCourseDirectory(), lessonDir.getName()),
+                                                    new File(course.getCacheDirectory(), lessonDir.getName()),
                                                     project);
                                         } catch (IOException e) {
                                             logger.warn(e.getMessage());
@@ -288,10 +284,9 @@ public class EduAdaptiveStepikConnector {
                                     }));
                         }
 
-                        final File lessonDirectory = new File(course.getCourseDirectory(),
-                                EduNames.LESSON + String.valueOf(adaptive.getIndex()));
+                        final File lessonDirectory = new File(course.getCacheDirectory(), adaptive.getDirectory());
                         StudyProjectGenerator.flushLesson(lessonDirectory, adaptive);
-                        StudyProjectGenerator.flushCourseJson(course, new File(course.getCourseDirectory()));
+                        StudyProjectGenerator.flushCourseJson(course, new File(course.getCacheDirectory()));
                         course.initCourse(true);
                     }
                 }
@@ -311,8 +306,8 @@ public class EduAdaptiveStepikConnector {
             try {
                 final VirtualFile taskDir = VfsUtil
                         .findFileByIoFile(new File(lessonDir.getCanonicalPath(),
-                                EduNames.TASK + unsolvedTask.getIndex()), true);
-                final File resourceRoot = new File(course.getCourseDirectory(), lessonDir.getName());
+                                unsolvedTask.getDirectory()), true);
+                final File resourceRoot = new File(course.getCacheDirectory(), lessonDir.getName());
                 File newResourceRoot = null;
                 if (taskDir != null) {
                     newResourceRoot = new File(resourceRoot, taskDir.getName());
@@ -343,7 +338,7 @@ public class EduAdaptiveStepikConnector {
             @NotNull final StepikWrappers.Step step, @NotNull String name) {
         final Task task = new Task();
         task.setName(name);
-        task.setStepId(lessonID);
+        task.setId(lessonID);
         task.setText(step.text);
         task.setStatus(StudyStatus.Unchecked);
         if (step.options.samples != null) {
@@ -517,7 +512,7 @@ public class EduAdaptiveStepikConnector {
     }
 
     private static int getAttemptId(@NotNull final Project project, @NotNull Task task) throws IOException {
-        final StepikWrappers.AttemptToPostWrapper attemptWrapper = new StepikWrappers.AttemptToPostWrapper(task.getStepId());
+        final StepikWrappers.AttemptToPostWrapper attemptWrapper = new StepikWrappers.AttemptToPostWrapper(task.getId());
 
         final HttpPost post = new HttpPost(EduStepikNames.STEPIK_API_URL + EduStepikNames.ATTEMPTS);
         post.setEntity(new StringEntity(new Gson().toJson(attemptWrapper)));

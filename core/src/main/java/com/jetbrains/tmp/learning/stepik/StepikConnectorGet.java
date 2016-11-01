@@ -220,10 +220,11 @@ public class StepikConnectorGet {
                 if (sectionWrapper != null) {
                     section.setName(sectionWrapper.title);
                 } else {
-                    section.setName(EduNames.SECTION + " id = " + sectionId);
+                    section.setName(EduNames.SECTION + sectionId);
                 }
+                section.setPosition(sectionWrapper.position);
                 section.addLessons(getLessons(sectionId));
-                course.addSectionWithSetIndex(section);
+                course.addSection(section);
             }
             return course;
         } catch (IOException e) {
@@ -257,7 +258,7 @@ public class StepikConnectorGet {
         Section section = new Section();
         section.setName(lesson.getName());
         section.addLesson(lesson);
-        course.addSectionWithSetIndex(section);
+        course.addSection(section);
         final Task recommendation = EduAdaptiveStepikConnector.getNextRecommendation(project, course);
         if (recommendation != null) {
             lesson.addTask(recommendation);
@@ -298,7 +299,7 @@ public class StepikConnectorGet {
         stepContainer.steps.stream().filter(stepSource ->
                 supported(stepSource.block.name)).forEach(stepSource -> {
             final Task task = new Task();
-            task.setStepId(stepSource.id);
+            task.setId(stepSource.id);
             task.setPosition(stepSource.position);
 
             switch (stepSource.block.name) {

@@ -69,7 +69,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
             return;
         }
 
-        String stepId = Integer.toString(targetTask.getStepId());
+        String stepId = Integer.toString(targetTask.getId());
         String userId = Integer.toString(StudyTaskManager.getInstance(project).getUser().getId());
 
         List<NameValuePair> nvps = new ArrayList<>();
@@ -83,7 +83,7 @@ public class DownloadSubmission extends StudyActionWithShortcut {
                 StepikWrappers.MetricsWrapper.PluginNames.STEPIK_UNION,
                 StepikWrappers.MetricsWrapper.MetricActions.DOWNLOAD,
                 targetTask.getLesson().getSection().getCourse().getId(),
-                targetTask.getStepId());
+                targetTask.getId());
         StepikConnectorPost.postMetric(metric);
 
         LangManager langManager = StudyTaskManager.getInstance(project).getLangManager();

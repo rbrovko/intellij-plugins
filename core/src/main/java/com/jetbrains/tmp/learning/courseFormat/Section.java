@@ -1,6 +1,7 @@
 package com.jetbrains.tmp.learning.courseFormat;
 
 import com.google.gson.annotations.Expose;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.xmlb.annotations.Transient;
 import com.jetbrains.tmp.learning.core.EduNames;
 import com.jetbrains.tmp.learning.core.EduUtils;
@@ -18,12 +19,11 @@ public class Section implements StudyItem {
     @Expose
     private List<Lesson> lessons = new ArrayList<>();
     @Expose
-    private int index;
-    @Expose
-    private int id;
+    private int id = NULL_ID;
     @Transient
     private Course myCourse = null;
-
+    @Expose
+    private int position;
 
     public Section() {
     }
@@ -46,13 +46,13 @@ public class Section implements StudyItem {
     }
 
     @Override
-    public int getIndex() {
-        return index;
+    public int getPosition() {
+        return position;
     }
 
     @Override
-    public void setIndex(int index) {
-        this.index = index;
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public void addLesson(Lesson lesson) {
@@ -74,7 +74,7 @@ public class Section implements StudyItem {
     @Override
     public StudyStatus getStatus() {
         for (Lesson lesson : lessons) {
-            if (lesson.getIndex() != -1 && lesson.getStatus() != StudyStatus.Solved)
+            if (lesson.getId() != NULL_ID && lesson.getStatus() != StudyStatus.Solved)
                 return StudyStatus.Unchecked;
         }
 
@@ -110,7 +110,17 @@ public class Section implements StudyItem {
         this.id = id;
     }
 
+    @Override
+    public String getDirectory() {
+        return EduNames.SECTION + id;
+    }
+
     public int getId() {
         return id;
+    }
+
+    @Override
+    public String getPath() {
+        return FileUtil.join(myCourse.getPath(), getDirectory());
     }
 }

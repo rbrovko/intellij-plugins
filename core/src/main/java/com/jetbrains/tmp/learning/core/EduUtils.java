@@ -32,7 +32,7 @@ public class EduUtils {
 
     private static final Logger logger = Logger.getInstance(EduUtils.class.getName());
 
-    public static final Comparator<StudyItem> INDEX_COMPARATOR = (o1, o2) -> o1.getIndex() - o2.getIndex();
+    public static final Comparator<StudyItem> POSITION_COMPARATOR = (o1, o2) -> o1.getPosition() - o2.getPosition();
 
     public static void enableAction(@NotNull final AnActionEvent event, boolean isEnable) {
         final Presentation presentation = event.getPresentation();
@@ -47,7 +47,7 @@ public class EduUtils {
      * @param logicalName part of name without index
      * @return index of object
      */
-    public static int getIndex(@NotNull final String fullName, @NotNull final String logicalName) {
+    public static int getIdFromDirectory(@NotNull final String fullName, @NotNull final String logicalName) {
         if (!fullName.startsWith(logicalName)) {
             return -1;
         }

@@ -15,6 +15,7 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.io.FileUtil;
 import com.jetbrains.tmp.learning.StudyProjectComponent;
 import com.jetbrains.tmp.learning.StudyTaskManager;
 import com.jetbrains.tmp.learning.core.EduNames;
@@ -74,15 +75,13 @@ public class JavaCourseBuilder extends JavaModuleBuilder implements CourseBuilde
             @NotNull ModifiableModuleModel moduleModel, Course course,
             String moduleDir, Module utilModule) throws InvalidDataException,
             IOException, ModuleWithNameAlreadyExists, JDOMException, ConfigurationException {
-        int sectionIndex = 0;
         int lessonIndex = 1;
         for (Section section : course.getSections()) {
-            section.setIndex(++sectionIndex);
-            LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, sectionIndex, utilModule);
+            LessonBuilder sectionBuilder = new StepikJavaSectionBuilder(moduleDir, section.getDirectory(), utilModule);
             sectionBuilder.createLesson(moduleModel);
             for (Lesson lesson : section.getLessons()) {
-                lesson.setIndex(lessonIndex++);
-                String sectionDir = moduleDir + "/" + EduNames.SECTION + sectionIndex;
+                lesson.setPosition(lessonIndex++);
+                String sectionDir = FileUtil.join(moduleDir, section.getDirectory());
                 LessonBuilder lessonBuilder = new StepikJavaLessonBuilder(sectionDir, lesson, utilModule);
                 lessonBuilder.createLesson(moduleModel);
             }

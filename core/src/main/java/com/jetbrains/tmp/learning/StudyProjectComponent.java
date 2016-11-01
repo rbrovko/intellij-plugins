@@ -139,7 +139,7 @@ public class StudyProjectComponent implements ProjectComponent {
         if (course == null) {
             return;
         }
-        final File resourceDirectory = new File(course.getCourseDirectory());
+        final File resourceDirectory = new File(course.getCacheDirectory());
         if (!resourceDirectory.exists()) {
             return;
         }
@@ -301,23 +301,23 @@ public class StudyProjectComponent implements ProjectComponent {
                 return;
             }
             if (taskDir != null && taskDir.getName().contains(EduNames.TASK)) {
-                int taskIndex = EduUtils.getIndex(taskDir.getName(), EduNames.TASK) - 1;
+                int taskId = EduUtils.getIdFromDirectory(taskDir.getName(), EduNames.TASK);
                 final VirtualFile lessonDir = taskDir.getParent();
                 if (lessonDir != null && lessonDir.getName().contains(EduNames.LESSON)) {
                     final Lesson lesson = course.getLessonOfMnemonic(lessonDir.getName());
                     if (lesson == null) {
                         return;
                     }
-                    final List<Task> tasks = lesson.getTaskList();
-                    if (StudyUtils.indexIsValid(taskIndex, tasks)) {
-                        final Task task = tasks.get(taskIndex);
-                        final TaskFile taskFile = new TaskFile();
-                        taskFile.initTaskFile(task, false);
-                        taskFile.setUserCreated(true);
-                        final String name = createdFile.getName();
-                        taskFile.name = name;
-                        task.getTaskFiles().put(name, taskFile);
+                    Task task = lesson.getTask(taskId);
+                    if (task == null) {
+                        return;
                     }
+                    final TaskFile taskFile = new TaskFile();
+                    taskFile.initTaskFile(task, false);
+                    taskFile.setUserCreated(true);
+                    final String name = createdFile.getName();
+                    taskFile.name = name;
+                    task.getTaskFiles().put(name, taskFile);
                 }
             }
         }

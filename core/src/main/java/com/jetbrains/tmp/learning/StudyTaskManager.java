@@ -154,7 +154,7 @@ public class StudyTaskManager implements PersistentStateComponent<Element>, Dumb
                             "courses",
                             Integer.toString(myCourse.getId()));
                     if (new File(updatedCoursePath).exists()) {
-                        myCourse.setCourseDirectory(updatedCoursePath);
+                        myCourse.setCacheDirectory(updatedCoursePath);
                     }
                 }
             }

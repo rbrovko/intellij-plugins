@@ -201,7 +201,7 @@ public class StepikWrappers {
 
         public StepSource(Project project, Task task, int lesson) {
             this.lesson = lesson;
-            position = task.getIndex();
+            position = task.getPosition();
             block = Step.fromTask(project, task);
         }
     }

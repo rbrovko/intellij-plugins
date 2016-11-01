@@ -52,7 +52,6 @@ public class StudySmartChecker {
                 final File resourceFile =
                         StudyUtils.copyResourceFile(virtualFile.getName(),
                                 windowCopy.getName(),
-                                project,
                                 usersTaskFile.getTask());
                 final TaskFile windowTaskFile = new TaskFile();
                 TaskFile.copy(answerTaskFile, windowTaskFile);

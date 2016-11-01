@@ -52,7 +52,7 @@ public class EduUtilModuleBuilder extends JavaModuleBuilder {
 //        final List<String> urls = OrderEntryFix.refreshAndConvertToUrls(defaultRoots);
 //        ModuleRootModificationUtil.addModuleLibrary(baseModule, descriptor.getPresentableName(), urls, Collections.<String>emptyList());
 
-        String courseDirectory = StudyTaskManager.getInstance(project).getCourse().getCourseDirectory();
+        String courseDirectory = StudyTaskManager.getInstance(project).getCourse().getDirectory();
         FileUtil.copyDirContent(new File(courseDirectory, EduNames.UTIL), new File(src.getPath()));
         return baseModule;
     }
